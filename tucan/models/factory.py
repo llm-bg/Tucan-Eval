@@ -1,6 +1,8 @@
 from typing import Dict, Any, Optional
 from pathlib import Path
 
+import torch
+
 from .base import BaseModel
 from .huggingface_model import HuggingFaceModel
 from .openai_model import OpenAIModel
@@ -53,7 +55,13 @@ class ModelFactory:
         
         # Add default model kwargs optimized for BgGPT/Gemma models
         model_kwargs.setdefault('dtype', 'bfloat16')  # Recommended for BgGPT models
-        model_kwargs.setdefault('load_in_4bit', True)  # Memory efficient
+        # 4-bit quantization (bitsandbytes) requires a CUDA GPU. Only default
+        # it on when CUDA is actually available and the caller isn't forcing
+        # CPU-only mode, so evaluation doesn't crash out of the box on
+        # CPU-only machines (e.g. Apple Silicon Macs). utils.initialize_model
+        # has a matching guard in case load_in_4bit=True is passed explicitly.
+        default_load_in_4bit = device != 'cpu' and torch.cuda.is_available()
+        model_kwargs.setdefault('load_in_4bit', default_load_in_4bit)
         
         # Set attention implementation for Gemma models (flash attention not supported)
         if 'gemma' in model_name.lower() or 'bggpt' in model_name.lower() or 'tucan' in model_name.lower():

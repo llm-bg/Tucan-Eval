@@ -66,16 +66,24 @@ def initialize_model(config):
     if not token or token == "YOUR_HF_TOKEN_HERE":
         token = None
 
-    # Set up quantization config if needed
+    # Set up quantization config if needed. bitsandbytes 4-bit quantization
+    # requires a CUDA GPU, so this is only attempted on "cuda" -- silently
+    # falling back on CPU/MPS instead of crashing with a bitsandbytes error.
     quantization_config = None
     if config.get("load_in_4bit", False):
-        quantization_config = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_compute_dtype=torch.float16,
-            bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_type="nf4",
-        )
-        print("🔧 Using 4-bit quantization")
+        if device == "cuda":
+            quantization_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.float16,
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_quant_type="nf4",
+            )
+            print("🔧 Using 4-bit quantization")
+        else:
+            print(
+                f"⚠️  4-bit quantization requested but no CUDA GPU is available "
+                f"(device={device.upper()}); running in full precision instead."
+            )
 
     # Load tokenizer
     print("📝 Loading tokenizer...")

@@ -5,7 +5,8 @@
 This small Python package provides a **unified command-line interface** for evaluating language models on function-calling tasks, designed initially for the [Tucan series](https://huggingface.co/collections/llm-bg/tucan-6855825dbb0811b0e9672607) but adaptable for any other models.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI](https://img.shields.io/pypi/v/tucan-eval.svg)](https://pypi.org/project/tucan-eval/)
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![HuggingFace](https://img.shields.io/badge/🤗-Models-yellow.svg)](https://huggingface.co/collections/llm-bg/tucan-6855825dbb0811b0e9672607)
 
 **🎯 Single Command Evaluation** - No config files, no two-step processes, just pure CLI power!
@@ -45,9 +46,21 @@ This small Python package provides a **unified command-line interface** for eval
 ### Installation
 
 ```bash
+pip install tucan-eval
+```
+
+<details>
+<summary>Install from source instead</summary>
+
+```bash
 git clone https://github.com/llm-bg/Tucan-Eval.git
 cd Tucan-Eval && pip install -e .
 ```
+
+</details>
+
+> On a CPU-only machine, pass `--device cpu`; 4-bit quantization is
+> automatically skipped since it requires a CUDA GPU.
 
 ### Evaluate Tucan or BgGPT Models (Zero Configuration)
 
