@@ -5,7 +5,7 @@ This framework provides comprehensive evaluation capabilities for language model
 on function-calling tasks, with a command-line interface similar to lm-evaluation-harness.
 """
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __author__ = "Simeon Emanuilov"
 __email__ = "simeon.emanuilov@gmail.com"
 __description__ = "A Function-Calling Evaluation Framework for Language Models"

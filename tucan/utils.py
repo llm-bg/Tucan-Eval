@@ -98,6 +98,14 @@ def initialize_model(config):
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
+    # Decoder-only models need left-padding for correct batched generation:
+    # with right-padding (most tokenizers' default), every sequence shorter
+    # than the longest one in the batch ends up generating its next token
+    # right after a pad token instead of after its real content, silently
+    # corrupting output for batch_size > 1. This has no effect when
+    # batch_size == 1.
+    tokenizer.padding_side = "left"
+
     # Load model
     print("🤖 Loading model...")
     model_kwargs = {
