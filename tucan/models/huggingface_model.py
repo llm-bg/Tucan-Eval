@@ -147,9 +147,15 @@ class HuggingFaceModel(BaseModel):
                 generation_config=self.generation_config,
             )
         
+        # clean_up_tokenization_spaces is explicitly disabled: it's a WordPiece-era
+        # post-processing step that strips spaces before punctuation, which is
+        # destructive for BPE tokenizers (e.g. Llama/Qwen). Modern tokenizers
+        # already refuse to apply it for BPE and just warn instead; passing
+        # False here matches that safe behavior and silences the warning.
         response_text = self.tokenizer.decode(
             outputs[0][inputs.input_ids.shape[1]:],
-            skip_special_tokens=True
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=False
         ).strip()
         
         return response_text
@@ -220,7 +226,11 @@ class HuggingFaceModel(BaseModel):
                         # Extract only the generated portion (after input)
                         input_length = inputs.input_ids[i].shape[0]
                         response_tokens = output[input_length:]
-                        response_text = self.tokenizer.decode(response_tokens, skip_special_tokens=True).strip()
+                        response_text = self.tokenizer.decode(
+                            response_tokens,
+                            skip_special_tokens=True,
+                            clean_up_tokenization_spaces=False
+                        ).strip()
                         
                         # Log if requested or if verbose mode is enabled
                         if self.verbose:

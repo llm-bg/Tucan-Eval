@@ -137,8 +137,15 @@ def run_inference(config, samples, output_path, batch_size=1, verbose=False):
                         generation_config=generation_config,
                     )
 
+                # clean_up_tokenization_spaces=False avoids the WordPiece-era
+                # space-before-punctuation cleanup, which is destructive for BPE
+                # tokenizers (Llama/Qwen). Modern tokenizers already skip it and
+                # just warn; being explicit here matches that safe behavior and
+                # silences the warning.
                 response_text = tokenizer.decode(
-                    outputs[0][inputs.input_ids.shape[1] :], skip_special_tokens=True
+                    outputs[0][inputs.input_ids.shape[1] :],
+                    skip_special_tokens=True,
+                    clean_up_tokenization_spaces=False,
                 ).strip()
 
                 # Log to debug file if verbose mode is enabled
@@ -188,7 +195,9 @@ def run_inference(config, samples, output_path, batch_size=1, verbose=False):
                     input_length = inputs.input_ids[i].shape[0]
                     response_tokens = output[input_length:]
                     response_text = tokenizer.decode(
-                        response_tokens, skip_special_tokens=True
+                        response_tokens,
+                        skip_special_tokens=True,
+                        clean_up_tokenization_spaces=False,
                     ).strip()
 
                     # Log to debug file if verbose mode is enabled
